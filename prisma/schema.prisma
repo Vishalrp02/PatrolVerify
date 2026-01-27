@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String         @id @default(cuid())
+  name           String
+  username       String         @unique
+  password       String
+  role           String         @default("GUARD")
+  logs           PatrolLog[]
+  incidents      Incident[]
+  guardLocation  GuardLocation?
+  guardRoutes    GuardRouteAssignment[]
+}
+
+model GuardLocation {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  latitude  Float
+  longitude Float
+  updatedAt DateTime @updatedAt
+}
+
+model Site {
+  id          String       @id @default(cuid())
+  name        String
+  checkpoints Checkpoint[]
+}
+
+model Checkpoint {
+  id               String           @id @default(cuid())
+  name             String
+  siteId           String
+  site             Site             @relation(fields: [siteId], references: [id])
+  latitude         Float
+  longitude        Float
+  logs             PatrolLog[]
+  routeCheckpoints RouteCheckpoint[]
+}
+
+model PatrolRoute {
+  id               String           @id @default(cuid())
+  name             String
+  isDefault        Boolean          @default(false)
+  routeCheckpoints RouteCheckpoint[]
+  guardAssignments GuardRouteAssignment[]
+}
+
+model RouteCheckpoint {
+  id           String      @id @default(cuid())
+  routeId      String
+  route        PatrolRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  checkpointId String
+  checkpoint   Checkpoint  @relation(fields: [checkpointId], references: [id], onDelete: Cascade)
+  order        Int         // Sequence along the route
+}
+
+model PatrolLog {
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  checkpointId String
+  checkpoint   Checkpoint @relation(fields: [checkpointId], references: [id])
+  scannedAt    DateTime   @default(now())
+  gpsLat       Float?     // Actual location where scan happened
+  gpsLong      Float?
+  isVerified   Boolean    @default(false)
+}
+
+model Incident {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  description String
+  aiSummary   String?  // Gemini Output
+  createdAt   DateTime @default(now())
+}
+
+model GuardRouteAssignment {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  routeId   String
+  route     PatrolRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+  isActive  Boolean  @default(true)
+  
+  @@unique([userId, routeId])
+}
