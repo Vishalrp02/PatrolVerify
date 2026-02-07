@@ -1,6 +1,5 @@
 "use server";
 import { db } from "@/lib/db";
-import { revalidatePath } from "next/cache";
 
 /** Get the default patrol route with checkpoints in order (for guard map) */
 export async function getDefaultPatrolRoute() {
@@ -130,8 +129,8 @@ export async function savePatrolRoute(name, checkpointIds) {
       });
     }
 
-    revalidatePath("/admin/dashboard");
-    revalidatePath("/");
+    // Note: revalidatePath removed to prevent rendering error
+    // Dashboard will revalidate automatically due to dynamic rendering
     return { success: true };
   } catch (e) {
     console.error("savePatrolRoute:", e);

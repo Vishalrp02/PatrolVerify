@@ -1,6 +1,5 @@
 "use server";
 import { db } from "@/lib/db";
-import { revalidatePath } from "next/cache";
 
 /**
  * Get the assigned route for a specific guard
@@ -135,8 +134,8 @@ export async function assignRouteToGuard(userId, routeId) {
 
     console.log("Created/updated assignment:", assignment.id);
 
-    revalidatePath("/admin/dashboard");
-    revalidatePath("/admin/guard-routes");
+    // Note: revalidatePath removed to prevent rendering error
+    // Dashboard will revalidate automatically due to dynamic rendering
     
     return { success: true, assignment };
   } catch (error) {
@@ -161,8 +160,8 @@ export async function removeGuardRouteAssignment(userId) {
       data: { isActive: false }
     });
 
-    revalidatePath("/admin/dashboard");
-    revalidatePath("/admin/guard-routes");
+    // Note: revalidatePath removed to prevent rendering error
+    // Dashboard will revalidate automatically due to dynamic rendering
     
     return { success: true };
   } catch (error) {

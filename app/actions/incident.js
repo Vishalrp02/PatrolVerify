@@ -1,7 +1,6 @@
 "use server";
 import { db } from "@/lib/db";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { revalidatePath } from "next/cache";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
@@ -92,7 +91,8 @@ Respond with ONLY valid JSON, no other text:
     });
 
     console.log("✅ 3. Incident Logged:", finalSummary);
-    revalidatePath("/admin/dashboard");
+    // Note: revalidatePath removed to prevent rendering error
+    // Dashboard will revalidate automatically due to dynamic rendering
 
     return { success: true };
   } catch (error) {

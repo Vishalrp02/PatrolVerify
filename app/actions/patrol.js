@@ -1,6 +1,5 @@
 "use server";
 import { db } from "@/lib/db";
-import { revalidatePath } from "next/cache";
 
 // Calculate distance in meters
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -41,7 +40,8 @@ export async function submitScan(checkpointId, userId, userLat, userLong) {
       },
     });
 
-    revalidatePath("/admin/dashboard");
+    // Note: revalidatePath removed to prevent rendering error
+    // Dashboard will revalidate automatically due to dynamic rendering
     return {
       success: true,
       verified: isVerified,

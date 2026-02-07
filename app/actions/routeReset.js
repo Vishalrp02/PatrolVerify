@@ -1,6 +1,5 @@
 "use server";
 import { db } from "@/lib/db";
-import { revalidatePath } from "next/cache";
 
 // Configuration: Duty duration in hours
 const DUTY_DURATION_HOURS = 8;
