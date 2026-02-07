@@ -57,9 +57,8 @@ export async function checkAndResetExpiredDuties() {
     // Log the reset for audit purposes
     console.log(`Reset ${resetResult.count} expired guard route assignments after ${DUTY_DURATION_HOURS} hours`);
     
-    // Revalidate admin dashboard to show updated status
-    revalidatePath("/admin/dashboard");
-    revalidatePath("/admin/guard-routes");
+    // Note: revalidatePath removed as it cannot be called during render
+    // Dashboard will revalidate automatically due to dynamic rendering
 
     return {
       success: true,
@@ -162,8 +161,8 @@ export async function resetGuardDuty(guardId) {
       }
     });
 
-    revalidatePath("/admin/dashboard");
-    revalidatePath("/admin/guard-routes");
+    // Note: revalidatePath removed as it cannot be called during render
+    // Dashboard will revalidate automatically due to dynamic rendering
 
     return {
       success: true,
